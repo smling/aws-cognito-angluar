@@ -5,8 +5,8 @@
 export const environment = {
   production: false,
   poolConfig : {
-    UserPoolId: 'Your user pool', // Your user pool id here
-    AppClientId: 'Your Client Id' // Your client id here  
+    UserPoolId: 'ap-southeast-1_7sj29bIno', // Your user pool id here
+    AppClientId: '766cqbgp6qg9qrqkgjl7384lfk' // Your client id here  
   }
 };
 

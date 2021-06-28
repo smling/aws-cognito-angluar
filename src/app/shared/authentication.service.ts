@@ -3,16 +3,20 @@ import { AuthenticationDetails, CognitoUser, CognitoUserAttribute, CognitoUserPo
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
-const userPool = new CognitoUserPool({
-  UserPoolId: environment.poolConfig.UserPoolId,
-  ClientId: environment.poolConfig.AppClientId
-});
-
 @Injectable()
 export class AuthenticationService {
+  private userPool = new CognitoUserPool({
+    UserPoolId: environment.poolConfig.UserPoolId,
+    ClientId: environment.poolConfig.AppClientId
+  });
+
   cognitoUser: any;
 
   constructor() { }
+
+  setUserPool(userPool: CognitoUserPool) {
+    this.userPool = userPool;    
+  }
 
   register(email: string, password: string) {
 
@@ -20,7 +24,7 @@ export class AuthenticationService {
     let validationData: CognitoUserAttribute[];
 
     return new Observable(observer => {
-      userPool.signUp(email, password, attributeList, validationData, (err, result) => {
+      this.userPool.signUp(email, password, attributeList, validationData, (err, result) => {
         if (err) {
           console.log("signUp error", err);
           observer.error(err);
@@ -32,13 +36,12 @@ export class AuthenticationService {
         observer.complete();
       });
     });
-
   }
 
   confirmAuthCode(code: string) {
     const user = {
       Username: this.cognitoUser.username,
-      Pool: userPool
+      Pool: this.userPool
     };
     return new Observable(observer => {
       const cognitoUser = new CognitoUser(user);
@@ -64,7 +67,7 @@ export class AuthenticationService {
 
     const userData = {
       Username: email,
-      Pool: userPool
+      Pool: this.userPool
     };
     const cognitoUser = new CognitoUser(userData);
 
@@ -84,12 +87,12 @@ export class AuthenticationService {
   }
 
   isLoggedIn() {
-    return userPool.getCurrentUser() != null;
+    return this.userPool.getCurrentUser() != null;
   }
 
   getAuthenticatedUser() {
     // gets the current user from the local storage
-    return userPool.getCurrentUser();
+    return this.userPool.getCurrentUser();
   }
 
   logOut() {
